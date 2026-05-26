@@ -3,69 +3,95 @@ import pandas as pd
 import plotly.graph_objects as go
 
 # =========================================================
-# CONFIGURACION
+# CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="Planificador Operativo",
+    page_title="Operational Planner",
     layout="wide"
 )
 
 # =========================================================
-# ESTILOS PRO
+# CSS PREMIUM UI
 # =========================================================
 st.markdown("""
 <style>
 
 /* Fondo principal */
 .stApp {
-    background-color: #F5F7FB;
+    background-color: #F4F7FB;
 }
 
-/* Títulos */
+/* Header */
 h1 {
-    color: #0F172A !important;
+    color: #111827 !important;
+    font-size: 42px !important;
     font-weight: 800 !important;
+    margin-bottom: 0px;
 }
 
 h2, h3 {
-    color: #1E293B !important;
+    color: #1F2937 !important;
     font-weight: 700 !important;
 }
 
-/* KPI Cards */
+/* KPI CARDS */
 [data-testid="metric-container"] {
+
     background: white;
-    border-radius: 18px;
-    padding: 20px;
-    border: 1px solid #E2E8F0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+
+    border-radius: 22px;
+
+    padding: 22px;
+
+    border: 1px solid #E5E7EB;
+
+    box-shadow:
+        0px 10px 25px rgba(0,0,0,0.04);
+
+    transition: 0.3s;
 }
 
-/* Dataframe */
+[data-testid="metric-container"]:hover {
+
+    transform: translateY(-4px);
+}
+
+/* Dataframes */
 [data-testid="stDataFrame"] {
+
     background: white;
-    border-radius: 18px;
-    border: 1px solid #E2E8F0;
-    padding: 10px;
+
+    border-radius: 22px;
+
+    border: 1px solid #E5E7EB;
+
+    padding: 12px;
+
+    box-shadow:
+        0px 10px 25px rgba(0,0,0,0.04);
 }
 
-/* Botones */
-.stButton > button {
-    background: linear-gradient(
-        135deg,
-        #2563EB,
-        #1D4ED8
-    );
+/* Plotly charts */
+.element-container:has(.js-plotly-plot) {
 
-    color: white;
-    border-radius: 12px;
-    border: none;
-    padding: 12px 20px;
-    font-weight: 600;
+    background: white;
+
+    border-radius: 24px;
+
+    padding: 20px;
+
+    border: 1px solid #E5E7EB;
+
+    box-shadow:
+        0px 10px 30px rgba(0,0,0,0.04);
+
+    margin-bottom: 20px;
 }
 
-/* Download Button */
+/* Buttons */
+.stButton > button,
 .stDownloadButton > button {
+
     background: linear-gradient(
         135deg,
         #2563EB,
@@ -73,24 +99,39 @@ h2, h3 {
     );
 
     color: white;
-    border-radius: 12px;
+
     border: none;
-    padding: 12px 20px;
-    font-weight: 600;
-}
 
-/* Charts */
-.js-plotly-plot {
-    background: white !important;
-    border-radius: 18px;
-    padding: 10px;
-    border: 1px solid #E2E8F0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-/* Alertas */
-.stAlert {
     border-radius: 14px;
+
+    padding: 12px 22px;
+
+    font-weight: 600;
+
+    transition: 0.3s;
+}
+
+.stButton > button:hover,
+.stDownloadButton > button:hover {
+
+    transform: scale(1.02);
+
+    box-shadow:
+        0px 8px 18px rgba(37,99,235,0.25);
+}
+
+/* Alerts */
+.stAlert {
+
+    border-radius: 16px;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+
+    background: white;
+
+    border-right: 1px solid #E5E7EB;
 }
 
 </style>
@@ -100,156 +141,172 @@ h2, h3 {
 # DATA
 # =========================================================
 tareas = [
+
     {
         "Actividad": "Actualizar indicadores productividad OBT",
         "Frecuencia": "Mensual (1-5)",
         "Prioridad": "Alta",
         "Duracion": 2,
         "Inicio": 1,
-        "Fin": 5,
+        "Fin": 5
     },
+
     {
         "Actividad": "Actualizar indicadores productividad PICKING CO",
         "Frecuencia": "Mensual (1-5)",
         "Prioridad": "Alta",
         "Duracion": 2,
         "Inicio": 1,
-        "Fin": 5,
+        "Fin": 5
     },
+
     {
         "Actividad": "Actualizar indicadores productividad ALMACEN CO",
         "Frecuencia": "Mensual (1-5)",
         "Prioridad": "Alta",
         "Duracion": 2,
         "Inicio": 1,
-        "Fin": 5,
+        "Fin": 5
     },
+
     {
         "Actividad": "Actualizar ajuste de inventario OBT",
         "Frecuencia": "Mensual (10-15)",
         "Prioridad": "Media",
         "Duracion": 1.5,
         "Inicio": 10,
-        "Fin": 15,
+        "Fin": 15
     },
+
     {
         "Actividad": "Actualizar ajuste de inventario ALMACEN CO",
         "Frecuencia": "Mensual (10-15)",
         "Prioridad": "Media",
         "Duracion": 1.5,
         "Inicio": 10,
-        "Fin": 15,
+        "Fin": 15
     },
+
     {
         "Actividad": "Indicador ajustes de PICKING CO",
         "Frecuencia": "Mensual (10-15)",
         "Prioridad": "Media",
         "Duracion": 1,
         "Inicio": 11,
-        "Fin": 16,
+        "Fin": 16
     },
+
     {
         "Actividad": "Indicador ajustes de DESGUASE",
         "Frecuencia": "Mensual (20-25)",
         "Prioridad": "Media",
         "Duracion": 1,
         "Inicio": 20,
-        "Fin": 24,
+        "Fin": 24
     },
+
     {
         "Actividad": "Documentos anulados",
         "Frecuencia": "Semanal",
         "Prioridad": "Alta",
         "Duracion": 1,
         "Inicio": 1,
-        "Fin": 31,
+        "Fin": 31
     },
+
     {
         "Actividad": "Ocupación sedes veta al paso",
         "Frecuencia": "Mensual (15-18)",
         "Prioridad": "Media",
         "Duracion": 1.5,
         "Inicio": 15,
-        "Fin": 18,
+        "Fin": 18
     },
+
     {
         "Actividad": "Documentos pendientes",
         "Frecuencia": "Semanal",
         "Prioridad": "Alta",
         "Duracion": 1.5,
         "Inicio": 1,
-        "Fin": 31,
+        "Fin": 31
     },
+
     {
         "Actividad": "Desarrollo proyecto modelación",
         "Frecuencia": "Variable",
         "Prioridad": "Baja",
         "Duracion": 4,
         "Inicio": 1,
-        "Fin": 31,
+        "Fin": 31
     },
+
     {
         "Actividad": "Seguimiento RPA",
         "Frecuencia": "Diario",
         "Prioridad": "Alta",
         "Duracion": 0.5,
         "Inicio": 1,
-        "Fin": 31,
+        "Fin": 31
     }
 ]
 
 df = pd.DataFrame(tareas)
 
 # =========================================================
-# TITULO
+# HEADER
 # =========================================================
-st.title("📅 PLANIFICADOR OPERATIVO")
-st.caption("Agenda inteligente de trabajo")
+st.title("📅 Operational Planner")
+
+st.caption(
+    "Executive workload management dashboard"
+)
+
+st.divider()
 
 # =========================================================
-# KPIs
+# KPI CARDS
 # =========================================================
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     st.metric(
-        "TAREAS TOTALES",
+        "TASKS",
         len(df)
     )
 
 with col2:
     st.metric(
-        "ALTA PRIORIDAD",
+        "HIGH PRIORITY",
         len(df[df["Prioridad"] == "Alta"])
     )
 
 with col3:
     st.metric(
-        "HORAS PROGRAMADAS",
+        "SCHEDULED HOURS",
         f"{round(df['Duracion'].sum(),1)} h"
     )
 
 with col4:
     st.metric(
-        "ACTIVIDADES MENSUALES",
+        "MONTHLY TASKS",
         len(df[df["Frecuencia"].str.contains("Mensual")])
     )
 
-st.divider()
+# =========================================================
+# MAIN LAYOUT
+# =========================================================
+left, right = st.columns([1, 2])
 
 # =========================================================
-# LAYOUT PRINCIPAL
-# =========================================================
-left, right = st.columns([1.1, 1.9])
-
-# =========================================================
-# TABLA
+# TASK TABLE
 # =========================================================
 with left:
 
-    st.subheader("ACTIVIDADES")
+    st.subheader("📋 Tasks")
 
     st.dataframe(
+
         df[
             [
                 "Actividad",
@@ -258,77 +315,114 @@ with left:
                 "Duracion"
             ]
         ],
-        height=650,
+
+        height=750,
+
         width=700
     )
 
 # =========================================================
-# GANTT
+# EXECUTIVE ROADMAP
 # =========================================================
 with right:
 
-    st.subheader("CRONOGRAMA OPERATIVO")
+    st.subheader("📆 Executive Roadmap")
 
     fig = go.Figure()
 
     colores = {
-        "Alta": "#EF4444",
-        "Media": "#F59E0B",
-        "Baja": "#22C55E"
+
+        "Alta": "#FF5A5F",
+
+        "Media": "#F4B400",
+
+        "Baja": "#34A853"
     }
 
     for _, row in df.iterrows():
 
         fig.add_trace(
+
             go.Bar(
+
                 x=[row["Fin"] - row["Inicio"] + 1],
+
                 y=[row["Actividad"]],
+
                 base=[row["Inicio"]],
+
                 orientation='h',
 
                 marker=dict(
-                    color=colores[row["Prioridad"]]
+
+                    color=colores[row["Prioridad"]],
+
+                    line=dict(
+                        color="rgba(255,255,255,0.9)",
+                        width=1.5
+                    )
                 ),
 
                 hovertemplate=
                 f"""
                 <b>{row['Actividad']}</b><br>
-                Prioridad: {row['Prioridad']}<br>
-                Frecuencia: {row['Frecuencia']}<br>
-                Duración: {row['Duracion']} horas
+                Priority: {row['Prioridad']}<br>
+                Frequency: {row['Frecuencia']}<br>
+                Duration: {row['Duracion']} h
                 """
             )
         )
 
     fig.update_layout(
 
-        height=700,
+        height=820,
 
         barmode='overlay',
 
         plot_bgcolor='#FFFFFF',
 
-        paper_bgcolor='#F5F7FB',
+        paper_bgcolor='#FFFFFF',
 
         font=dict(
-            family="Arial",
+            family="Segoe UI",
             size=13,
-            color="#1E293B"
-        ),
-
-        xaxis=dict(
-            title='Días del mes',
-            tickmode='linear',
-            dtick=1,
-            range=[0, 32]
+            color="#111827"
         ),
 
         margin=dict(
-            l=20,
-            r=20,
-            t=20,
-            b=20
-        )
+            l=10,
+            r=10,
+            t=10,
+            b=10
+        ),
+
+        xaxis=dict(
+
+            title='MAY 2026',
+
+            tickmode='linear',
+
+            dtick=1,
+
+            showgrid=True,
+
+            gridcolor='rgba(0,0,0,0.05)',
+
+            zeroline=False,
+
+            range=[0.5, 31.5]
+        ),
+
+        yaxis=dict(
+
+            showgrid=False,
+
+            automargin=True,
+
+            categoryorder='total ascending'
+        ),
+
+        showlegend=False
     )
 
     st.plotly_chart(
@@ -337,11 +431,11 @@ with right:
     )
 
 # =========================================================
-# CARGA DIARIA
+# WORKLOAD ANALYSIS
 # =========================================================
 st.divider()
 
-st.subheader("📊 CARGA DE TRABAJO")
+st.subheader("📊 Workload Analysis")
 
 carga = []
 
@@ -352,45 +446,67 @@ for dia in range(1, 32):
     for _, row in df.iterrows():
 
         if row["Inicio"] <= dia <= row["Fin"]:
+
             total += row["Duracion"]
 
     carga.append(total)
 
 carga_df = pd.DataFrame({
+
     "Dia": list(range(1, 32)),
+
     "Horas": carga
 })
 
 fig2 = go.Figure()
 
 fig2.add_trace(
-    go.Bar(
+
+    go.Scatter(
+
         x=carga_df["Dia"],
-        y=carga_df["Horas"]
+
+        y=carga_df["Horas"],
+
+        mode='lines+markers',
+
+        line=dict(
+            width=4,
+            color='#2563EB'
+        ),
+
+        marker=dict(
+            size=8
+        ),
+
+        fill='tozeroy'
     )
 )
 
 fig2.add_hline(
+
     y=8,
+
     line_dash="dash",
+
     line_color="red"
 )
 
 fig2.update_layout(
 
-    height=350,
+    height=380,
 
     plot_bgcolor='#FFFFFF',
 
-    paper_bgcolor='#F5F7FB',
+    paper_bgcolor='#FFFFFF',
+
+    title="Daily Workload Capacity",
 
     font=dict(
-        family="Arial",
+        family="Segoe UI",
         size=13,
-        color="#1E293B"
-    ),
-
-    title="Carga de trabajo por día"
+        color="#111827"
+    )
 )
 
 st.plotly_chart(
@@ -399,39 +515,43 @@ st.plotly_chart(
 )
 
 # =========================================================
-# ALERTAS
+# ALERTS
 # =========================================================
 st.divider()
 
-st.subheader("🚨 ALERTAS")
+st.subheader("🚨 Capacity Alerts")
 
 dias_saturados = carga_df[carga_df["Horas"] > 8]
 
 if len(dias_saturados) > 0:
 
     st.warning(
-        f"⚠️ Hay {len(dias_saturados)} días con sobrecarga."
+        f"⚠️ {len(dias_saturados)} overloaded days detected."
     )
 
     st.dataframe(dias_saturados)
 
 else:
 
-    st.success("✅ No hay sobrecarga.")
+    st.success("✅ Workload balanced.")
 
 # =========================================================
-# DESCARGA
+# EXPORT
 # =========================================================
 st.divider()
 
-st.subheader("📥 EXPORTAR")
+st.subheader("📥 Export")
 
 csv = df.to_csv(index=False)
 
 st.download_button(
-    label="Descargar CSV",
+
+    label="Download CSV",
+
     data=csv,
-    file_name="planificador_operativo.csv",
+
+    file_name="operational_planner.csv",
+
     mime="text/csv"
 )
 
@@ -439,5 +559,5 @@ st.download_button(
 # FOOTER
 # =========================================================
 st.caption(
-    "Las tareas se organizan automáticamente según prioridad y frecuencia."
+    "Tasks are dynamically distributed based on workload and operational frequency."
 )
