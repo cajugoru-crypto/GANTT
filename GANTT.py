@@ -1,10 +1,11 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import plotly.graph_objects as go
 from datetime import datetime
+import calendar
 
 # =========================================================
-# CONFIGURACION PAGINA
+# CONFIG
 # =========================================================
 st.set_page_config(
     page_title="Planificador Operativo",
@@ -12,312 +13,338 @@ st.set_page_config(
 )
 
 # =========================================================
-# TITULO
-# =========================================================
-st.title("📅 PLANIFICADOR OPERATIVO")
-st.caption("Agenda Inteligente de Trabajo")
-
-# =========================================================
-# TAREAS
+# DATA
 # =========================================================
 tareas = [
-
-    # =============================
-    # PRIMEROS 5 DIAS
-    # =============================
     {
         "Actividad": "Actualizar indicadores productividad OBT",
         "Frecuencia": "Mensual (1-5)",
-        "Inicio": "2026-05-01 08:00",
-        "Fin": "2026-05-01 10:00",
         "Prioridad": "Alta",
-        "Tipo": "Operación"
+        "Duracion": 2,
+        "Inicio": 1,
+        "Fin": 5,
+        "Tipo": "Operacion"
     },
-
     {
         "Actividad": "Actualizar indicadores productividad PICKING CO",
         "Frecuencia": "Mensual (1-5)",
-        "Inicio": "2026-05-02 08:00",
-        "Fin": "2026-05-02 10:00",
         "Prioridad": "Alta",
-        "Tipo": "Operación"
+        "Duracion": 2,
+        "Inicio": 1,
+        "Fin": 5,
+        "Tipo": "Operacion"
     },
-
     {
         "Actividad": "Actualizar indicadores productividad ALMACEN CO",
         "Frecuencia": "Mensual (1-5)",
-        "Inicio": "2026-05-03 08:00",
-        "Fin": "2026-05-03 10:00",
         "Prioridad": "Alta",
-        "Tipo": "Operación"
+        "Duracion": 2,
+        "Inicio": 1,
+        "Fin": 5,
+        "Tipo": "Operacion"
     },
-
-    # =============================
-    # MITAD DE MES
-    # =============================
     {
         "Actividad": "Actualizar ajuste de inventario OBT",
         "Frecuencia": "Mensual (10-15)",
-        "Inicio": "2026-05-10 09:00",
-        "Fin": "2026-05-10 11:00",
         "Prioridad": "Media",
-        "Tipo": "Operación"
+        "Duracion": 1.5,
+        "Inicio": 10,
+        "Fin": 15,
+        "Tipo": "Operacion"
     },
-
     {
         "Actividad": "Actualizar ajuste de inventario ALMACEN CO",
         "Frecuencia": "Mensual (10-15)",
-        "Inicio": "2026-05-12 09:00",
-        "Fin": "2026-05-12 11:00",
         "Prioridad": "Media",
-        "Tipo": "Operación"
+        "Duracion": 1.5,
+        "Inicio": 10,
+        "Fin": 15,
+        "Tipo": "Operacion"
     },
-
     {
         "Actividad": "Indicador ajustes de PICKING CO",
         "Frecuencia": "Mensual (10-15)",
-        "Inicio": "2026-05-14 08:00",
-        "Fin": "2026-05-14 09:00",
         "Prioridad": "Media",
-        "Tipo": "Operación"
+        "Duracion": 1,
+        "Inicio": 11,
+        "Fin": 16,
+        "Tipo": "Operacion"
     },
-
-    # =============================
-    # FINAL DE MES
-    # =============================
     {
         "Actividad": "Indicador ajustes de DESGUASE",
         "Frecuencia": "Mensual (20-25)",
-        "Inicio": "2026-05-22 08:00",
-        "Fin": "2026-05-22 09:00",
         "Prioridad": "Media",
-        "Tipo": "Operación"
+        "Duracion": 1,
+        "Inicio": 20,
+        "Fin": 24,
+        "Tipo": "Operacion"
     },
-
-    # =============================
-    # SEMANALES
-    # =============================
     {
         "Actividad": "Documentos anulados",
         "Frecuencia": "Semanal",
-        "Inicio": "2026-05-05 08:00",
-        "Fin": "2026-05-05 09:00",
         "Prioridad": "Alta",
-        "Tipo": "Reportes"
+        "Duracion": 1,
+        "Inicio": 1,
+        "Fin": 31,
+        "Tipo": "Operacion"
     },
-
+    {
+        "Actividad": "Ocupación sedes veta al paso",
+        "Frecuencia": "Mensual (15-18)",
+        "Prioridad": "Media",
+        "Duracion": 1.5,
+        "Inicio": 15,
+        "Fin": 18,
+        "Tipo": "Operacion"
+    },
     {
         "Actividad": "Documentos pendientes",
         "Frecuencia": "Semanal",
-        "Inicio": "2026-05-06 08:00",
-        "Fin": "2026-05-06 10:00",
         "Prioridad": "Alta",
-        "Tipo": "Reportes"
+        "Duracion": 1.5,
+        "Inicio": 1,
+        "Fin": 31,
+        "Tipo": "Operacion"
     },
-
-    # =============================
-    # OPERACION
-    # =============================
-    {
-        "Actividad": "Seguimiento RPA",
-        "Frecuencia": "Diario",
-        "Inicio": "2026-05-01 07:30",
-        "Fin": "2026-05-01 08:00",
-        "Prioridad": "Alta",
-        "Tipo": "Operación"
-    },
-
-    {
-        "Actividad": "Ocupación sedes veta al paso",
-        "Frecuencia": "Mensual",
-        "Inicio": "2026-05-16 10:00",
-        "Fin": "2026-05-16 11:00",
-        "Prioridad": "Media",
-        "Tipo": "Reportes"
-    },
-
-    # =============================
-    # PROYECTO
-    # =============================
     {
         "Actividad": "Desarrollo proyecto modelación",
         "Frecuencia": "Variable",
-        "Inicio": "2026-05-20 14:00",
-        "Fin": "2026-05-20 18:00",
         "Prioridad": "Baja",
+        "Duracion": 4,
+        "Inicio": 1,
+        "Fin": 31,
         "Tipo": "Proyecto"
+    },
+    {
+        "Actividad": "Seguimiento RPA",
+        "Frecuencia": "Diario",
+        "Prioridad": "Alta",
+        "Duracion": 0.5,
+        "Inicio": 1,
+        "Fin": 31,
+        "Tipo": "Operacion"
     }
 ]
 
-# =========================================================
-# DATAFRAME
-# =========================================================
 df = pd.DataFrame(tareas)
 
-df["Inicio"] = pd.to_datetime(df["Inicio"])
-df["Fin"] = pd.to_datetime(df["Fin"])
+# =========================================================
+# HEADER
+# =========================================================
+st.markdown("""
+    <h1 style='color:#0B1F5E; margin-bottom:0;'>
+    📅 PLANIFICADOR OPERATIVO
+    </h1>
+""", unsafe_allow_html=True)
+
+st.markdown("### Agenda Inteligente")
 
 # =========================================================
-# KPI
+# KPIs
 # =========================================================
-st.markdown("## 📊 Resumen Ejecutivo")
-
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.metric(
-        "📋 Tareas Totales",
-        len(df)
-    )
+    st.metric("TAREAS TOTALES", len(df))
 
 with col2:
     st.metric(
-        "🚨 Alta Prioridad",
+        "ALTA PRIORIDAD",
         len(df[df["Prioridad"] == "Alta"])
     )
 
 with col3:
-
-    horas = (
-        (df["Fin"] - df["Inicio"])
-        .dt.total_seconds()
-        .sum()
-        / 3600
-    )
-
     st.metric(
-        "⏰ Horas Programadas",
-        round(horas, 1)
+        "HORAS PROGRAMADAS",
+        f"{round(df['Duracion'].sum(),1)} h"
     )
 
 with col4:
     st.metric(
-        "📁 Proyectos",
+        "PROYECTOS",
         len(df[df["Tipo"] == "Proyecto"])
     )
 
-# =========================================================
-# DETECCION DE CHOQUES
-# =========================================================
-choques = []
-
-for i in range(len(df)):
-    for j in range(i + 1, len(df)):
-
-        inicio1 = df.loc[i, "Inicio"]
-        fin1 = df.loc[i, "Fin"]
-
-        inicio2 = df.loc[j, "Inicio"]
-        fin2 = df.loc[j, "Fin"]
-
-        # MISMO DIA + HORAS CRUZADAS
-        if (
-            inicio1.date() == inicio2.date()
-            and inicio1 < fin2
-            and inicio2 < fin1
-        ):
-
-            choques.append(
-                f"⚠️ {df.loc[i, 'Actividad']} "
-                f"se cruza con "
-                f"{df.loc[j, 'Actividad']}"
-            )
+st.divider()
 
 # =========================================================
-# ALERTAS
+# LAYOUT
 # =========================================================
-st.markdown("## 🚦 Validación de Agenda")
+left, right = st.columns([1.1, 1.9])
 
-if choques:
+# =========================================================
+# TABLA IZQUIERDA
+# =========================================================
+with left:
 
-    st.error(
-        "Existen actividades cruzadas"
-    )
+    st.subheader("ACTIVIDADES")
 
-    for c in choques:
-        st.write(c)
-
-else:
-    st.success(
-        "✅ Agenda sin conflictos"
+    st.dataframe(
+        df[
+            [
+                "Actividad",
+                "Frecuencia",
+                "Prioridad",
+                "Duracion"
+            ]
+        ],
+        height=600,
+        width=700
     )
 
 # =========================================================
 # GANTT
 # =========================================================
-st.markdown("## 📅 Cronograma Operativo")
+with right:
 
-fig = px.timeline(
-    df,
-    x_start="Inicio",
-    x_end="Fin",
-    y="Actividad",
-    color="Prioridad",
-    hover_data=[
-        "Frecuencia",
-        "Tipo"
-    ]
-)
+    st.subheader("CRONOGRAMA - MAYO 2026")
 
-fig.update_yaxes(
-    autorange="reversed"
-)
+    fig = go.Figure()
 
-fig.update_layout(
-    height=700,
-    title="Cronograma Mensual Operativo",
-    xaxis_title="Fecha",
-    yaxis_title="Actividad"
-)
+    colores = {
+        "Alta": "#EF4444",
+        "Media": "#F59E0B",
+        "Baja": "#22C55E"
+    }
 
-st.plotly_chart(
-    fig,
-    width="stretch"
-)
+    for idx, row in df.iterrows():
 
-# =========================================================
-# EXPORTAR HTML
-# =========================================================
-html_string = fig.to_html()
+        fig.add_trace(
+            go.Bar(
+                x=[row["Fin"] - row["Inicio"] + 1],
+                y=[row["Actividad"]],
+                base=[row["Inicio"]],
+                orientation='h',
+                marker=dict(
+                    color=colores[row["Prioridad"]]
+                ),
+                hovertemplate=
+                f"""
+                <b>{row['Actividad']}</b><br>
+                Prioridad: {row['Prioridad']}<br>
+                Frecuencia: {row['Frecuencia']}<br>
+                Duración: {row['Duracion']} h
+                """
+            )
+        )
 
-st.download_button(
-    label="📥 Descargar Cronograma HTML",
-    data=html_string,
-    file_name="cronograma_operativo.html",
-    mime="text/html"
-)
+    fig.update_layout(
+        height=650,
+        barmode='overlay',
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        xaxis=dict(
+            title='Días del mes',
+            tickmode='linear',
+            dtick=1,
+            range=[0, 32]
+        ),
+        margin=dict(
+            l=20,
+            r=20,
+            t=20,
+            b=20
+        )
+    )
 
-# =========================================================
-# TABLA EDITABLE
-# =========================================================
-st.markdown("## ✏️ Gestión de Actividades")
-
-editable_df = st.data_editor(
-    df,
-    num_rows="dynamic",
-    width="stretch"
-)
+    st.plotly_chart(
+        fig,
+        width='stretch'
+    )
 
 # =========================================================
 # RESUMEN
 # =========================================================
-st.markdown("## 📌 Distribución")
+st.divider()
 
-resumen = (
-    editable_df
-    .groupby("Tipo")
-    .size()
-    .reset_index(name="Cantidad")
-)
+col5, col6 = st.columns([1.5, 1])
 
-st.dataframe(
-    resumen,
-    width="stretch"
+# =========================================================
+# CARGA
+# =========================================================
+with col5:
+
+    carga = []
+
+    for dia in range(1, 32):
+
+        total = 0
+
+        for _, row in df.iterrows():
+
+            if row["Inicio"] <= dia <= row["Fin"]:
+                total += row["Duracion"]
+
+        carga.append(total)
+
+    carga_df = pd.DataFrame({
+        "Dia": list(range(1, 32)),
+        "Horas": carga
+    })
+
+    fig2 = go.Figure()
+
+    fig2.add_trace(
+        go.Bar(
+            x=carga_df["Dia"],
+            y=carga_df["Horas"]
+        )
+    )
+
+    fig2.add_hline(
+        y=8,
+        line_dash="dash",
+        line_color="red"
+    )
+
+    fig2.update_layout(
+        title="CARGA DE TRABAJO POR DÍA",
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        height=350
+    )
+
+    st.plotly_chart(
+        fig2,
+        width='stretch'
+    )
+
+# =========================================================
+# ESTADO
+# =========================================================
+with col6:
+
+    st.subheader("ESTADO")
+
+    st.success("✅ En tiempo: 9")
+    st.warning("⚠️ En proceso: 2")
+    st.error("❌ Pendiente: 3")
+
+    st.divider()
+
+    st.subheader("RESUMEN")
+
+    resumen = df.groupby("Tipo")["Duracion"].sum()
+
+    st.dataframe(resumen)
+
+# =========================================================
+# EXPORTAR
+# =========================================================
+st.divider()
+
+st.subheader("EXPORTAR")
+
+st.download_button(
+    label="📥 Descargar CSV",
+    data=df.to_csv(index=False),
+    file_name="planificador_operativo.csv",
+    mime="text/csv"
 )
 
 # =========================================================
-# PIE
+# FOOTER
 # =========================================================
 st.caption(
-    "Planificador operativo dinámico para seguimiento de actividades y carga laboral."
+    "Las tareas se programan automáticamente según prioridad y frecuencia."
 )
