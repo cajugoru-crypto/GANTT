@@ -1,16 +1,100 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from datetime import datetime
-import calendar
 
 # =========================================================
-# CONFIG
+# CONFIGURACION
 # =========================================================
 st.set_page_config(
     page_title="Planificador Operativo",
     layout="wide"
 )
+
+# =========================================================
+# ESTILOS PRO
+# =========================================================
+st.markdown("""
+<style>
+
+/* Fondo principal */
+.stApp {
+    background-color: #F5F7FB;
+}
+
+/* Títulos */
+h1 {
+    color: #0F172A !important;
+    font-weight: 800 !important;
+}
+
+h2, h3 {
+    color: #1E293B !important;
+    font-weight: 700 !important;
+}
+
+/* KPI Cards */
+[data-testid="metric-container"] {
+    background: white;
+    border-radius: 18px;
+    padding: 20px;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Dataframe */
+[data-testid="stDataFrame"] {
+    background: white;
+    border-radius: 18px;
+    border: 1px solid #E2E8F0;
+    padding: 10px;
+}
+
+/* Botones */
+.stButton > button {
+    background: linear-gradient(
+        135deg,
+        #2563EB,
+        #1D4ED8
+    );
+
+    color: white;
+    border-radius: 12px;
+    border: none;
+    padding: 12px 20px;
+    font-weight: 600;
+}
+
+/* Download Button */
+.stDownloadButton > button {
+    background: linear-gradient(
+        135deg,
+        #2563EB,
+        #1D4ED8
+    );
+
+    color: white;
+    border-radius: 12px;
+    border: none;
+    padding: 12px 20px;
+    font-weight: 600;
+}
+
+/* Charts */
+.js-plotly-plot {
+    background: white !important;
+    border-radius: 18px;
+    padding: 10px;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Alertas */
+.stAlert {
+    border-radius: 14px;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 # =========================================================
 # DATA
@@ -23,7 +107,6 @@ tareas = [
         "Duracion": 2,
         "Inicio": 1,
         "Fin": 5,
-        "Tipo": "Operacion"
     },
     {
         "Actividad": "Actualizar indicadores productividad PICKING CO",
@@ -32,7 +115,6 @@ tareas = [
         "Duracion": 2,
         "Inicio": 1,
         "Fin": 5,
-        "Tipo": "Operacion"
     },
     {
         "Actividad": "Actualizar indicadores productividad ALMACEN CO",
@@ -41,7 +123,6 @@ tareas = [
         "Duracion": 2,
         "Inicio": 1,
         "Fin": 5,
-        "Tipo": "Operacion"
     },
     {
         "Actividad": "Actualizar ajuste de inventario OBT",
@@ -50,7 +131,6 @@ tareas = [
         "Duracion": 1.5,
         "Inicio": 10,
         "Fin": 15,
-        "Tipo": "Operacion"
     },
     {
         "Actividad": "Actualizar ajuste de inventario ALMACEN CO",
@@ -59,7 +139,6 @@ tareas = [
         "Duracion": 1.5,
         "Inicio": 10,
         "Fin": 15,
-        "Tipo": "Operacion"
     },
     {
         "Actividad": "Indicador ajustes de PICKING CO",
@@ -68,7 +147,6 @@ tareas = [
         "Duracion": 1,
         "Inicio": 11,
         "Fin": 16,
-        "Tipo": "Operacion"
     },
     {
         "Actividad": "Indicador ajustes de DESGUASE",
@@ -77,7 +155,6 @@ tareas = [
         "Duracion": 1,
         "Inicio": 20,
         "Fin": 24,
-        "Tipo": "Operacion"
     },
     {
         "Actividad": "Documentos anulados",
@@ -86,7 +163,6 @@ tareas = [
         "Duracion": 1,
         "Inicio": 1,
         "Fin": 31,
-        "Tipo": "Operacion"
     },
     {
         "Actividad": "Ocupación sedes veta al paso",
@@ -95,7 +171,6 @@ tareas = [
         "Duracion": 1.5,
         "Inicio": 15,
         "Fin": 18,
-        "Tipo": "Operacion"
     },
     {
         "Actividad": "Documentos pendientes",
@@ -104,7 +179,6 @@ tareas = [
         "Duracion": 1.5,
         "Inicio": 1,
         "Fin": 31,
-        "Tipo": "Operacion"
     },
     {
         "Actividad": "Desarrollo proyecto modelación",
@@ -113,7 +187,6 @@ tareas = [
         "Duracion": 4,
         "Inicio": 1,
         "Fin": 31,
-        "Tipo": "Proyecto"
     },
     {
         "Actividad": "Seguimiento RPA",
@@ -122,22 +195,16 @@ tareas = [
         "Duracion": 0.5,
         "Inicio": 1,
         "Fin": 31,
-        "Tipo": "Operacion"
     }
 ]
 
 df = pd.DataFrame(tareas)
 
 # =========================================================
-# HEADER
+# TITULO
 # =========================================================
-st.markdown("""
-    <h1 style='color:#0B1F5E; margin-bottom:0;'>
-    📅 PLANIFICADOR OPERATIVO
-    </h1>
-""", unsafe_allow_html=True)
-
-st.markdown("### Agenda Inteligente")
+st.title("📅 PLANIFICADOR OPERATIVO")
+st.caption("Agenda inteligente de trabajo")
 
 # =========================================================
 # KPIs
@@ -145,7 +212,10 @@ st.markdown("### Agenda Inteligente")
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.metric("TAREAS TOTALES", len(df))
+    st.metric(
+        "TAREAS TOTALES",
+        len(df)
+    )
 
 with col2:
     st.metric(
@@ -161,19 +231,19 @@ with col3:
 
 with col4:
     st.metric(
-        "PROYECTOS",
-        len(df[df["Tipo"] == "Proyecto"])
+        "ACTIVIDADES MENSUALES",
+        len(df[df["Frecuencia"].str.contains("Mensual")])
     )
 
 st.divider()
 
 # =========================================================
-# LAYOUT
+# LAYOUT PRINCIPAL
 # =========================================================
 left, right = st.columns([1.1, 1.9])
 
 # =========================================================
-# TABLA IZQUIERDA
+# TABLA
 # =========================================================
 with left:
 
@@ -188,7 +258,7 @@ with left:
                 "Duracion"
             ]
         ],
-        height=600,
+        height=650,
         width=700
     )
 
@@ -197,7 +267,7 @@ with left:
 # =========================================================
 with right:
 
-    st.subheader("CRONOGRAMA - MAYO 2026")
+    st.subheader("CRONOGRAMA OPERATIVO")
 
     fig = go.Figure()
 
@@ -207,7 +277,7 @@ with right:
         "Baja": "#22C55E"
     }
 
-    for idx, row in df.iterrows():
+    for _, row in df.iterrows():
 
         fig.add_trace(
             go.Bar(
@@ -215,30 +285,44 @@ with right:
                 y=[row["Actividad"]],
                 base=[row["Inicio"]],
                 orientation='h',
+
                 marker=dict(
                     color=colores[row["Prioridad"]]
                 ),
+
                 hovertemplate=
                 f"""
                 <b>{row['Actividad']}</b><br>
                 Prioridad: {row['Prioridad']}<br>
                 Frecuencia: {row['Frecuencia']}<br>
-                Duración: {row['Duracion']} h
+                Duración: {row['Duracion']} horas
                 """
             )
         )
 
     fig.update_layout(
-        height=650,
+
+        height=700,
+
         barmode='overlay',
-        plot_bgcolor='white',
-        paper_bgcolor='white',
+
+        plot_bgcolor='#FFFFFF',
+
+        paper_bgcolor='#F5F7FB',
+
+        font=dict(
+            family="Arial",
+            size=13,
+            color="#1E293B"
+        ),
+
         xaxis=dict(
             title='Días del mes',
             tickmode='linear',
             dtick=1,
             range=[0, 32]
         ),
+
         margin=dict(
             l=20,
             r=20,
@@ -253,91 +337,100 @@ with right:
     )
 
 # =========================================================
-# RESUMEN
+# CARGA DIARIA
 # =========================================================
 st.divider()
 
-col5, col6 = st.columns([1.5, 1])
+st.subheader("📊 CARGA DE TRABAJO")
 
-# =========================================================
-# CARGA
-# =========================================================
-with col5:
+carga = []
 
-    carga = []
+for dia in range(1, 32):
 
-    for dia in range(1, 32):
+    total = 0
 
-        total = 0
+    for _, row in df.iterrows():
 
-        for _, row in df.iterrows():
+        if row["Inicio"] <= dia <= row["Fin"]:
+            total += row["Duracion"]
 
-            if row["Inicio"] <= dia <= row["Fin"]:
-                total += row["Duracion"]
+    carga.append(total)
 
-        carga.append(total)
+carga_df = pd.DataFrame({
+    "Dia": list(range(1, 32)),
+    "Horas": carga
+})
 
-    carga_df = pd.DataFrame({
-        "Dia": list(range(1, 32)),
-        "Horas": carga
-    })
+fig2 = go.Figure()
 
-    fig2 = go.Figure()
-
-    fig2.add_trace(
-        go.Bar(
-            x=carga_df["Dia"],
-            y=carga_df["Horas"]
-        )
+fig2.add_trace(
+    go.Bar(
+        x=carga_df["Dia"],
+        y=carga_df["Horas"]
     )
+)
 
-    fig2.add_hline(
-        y=8,
-        line_dash="dash",
-        line_color="red"
-    )
+fig2.add_hline(
+    y=8,
+    line_dash="dash",
+    line_color="red"
+)
 
-    fig2.update_layout(
-        title="CARGA DE TRABAJO POR DÍA",
-        plot_bgcolor='white',
-        paper_bgcolor='white',
-        height=350
-    )
+fig2.update_layout(
 
-    st.plotly_chart(
-        fig2,
-        width='stretch'
-    )
+    height=350,
 
-# =========================================================
-# ESTADO
-# =========================================================
-with col6:
+    plot_bgcolor='#FFFFFF',
 
-    st.subheader("ESTADO")
+    paper_bgcolor='#F5F7FB',
 
-    st.success("✅ En tiempo: 9")
-    st.warning("⚠️ En proceso: 2")
-    st.error("❌ Pendiente: 3")
+    font=dict(
+        family="Arial",
+        size=13,
+        color="#1E293B"
+    ),
 
-    st.divider()
+    title="Carga de trabajo por día"
+)
 
-    st.subheader("RESUMEN")
-
-    resumen = df.groupby("Tipo")["Duracion"].sum()
-
-    st.dataframe(resumen)
+st.plotly_chart(
+    fig2,
+    width='stretch'
+)
 
 # =========================================================
-# EXPORTAR
+# ALERTAS
 # =========================================================
 st.divider()
 
-st.subheader("EXPORTAR")
+st.subheader("🚨 ALERTAS")
+
+dias_saturados = carga_df[carga_df["Horas"] > 8]
+
+if len(dias_saturados) > 0:
+
+    st.warning(
+        f"⚠️ Hay {len(dias_saturados)} días con sobrecarga."
+    )
+
+    st.dataframe(dias_saturados)
+
+else:
+
+    st.success("✅ No hay sobrecarga.")
+
+# =========================================================
+# DESCARGA
+# =========================================================
+st.divider()
+
+st.subheader("📥 EXPORTAR")
+
+csv = df.to_csv(index=False)
 
 st.download_button(
-    label="📥 Descargar CSV",
-    data=df.to_csv(index=False),
+    label="Descargar CSV",
+    data=csv,
     file_name="planificador_operativo.csv",
     mime="text/csv"
 )
@@ -346,5 +439,5 @@ st.download_button(
 # FOOTER
 # =========================================================
 st.caption(
-    "Las tareas se programan automáticamente según prioridad y frecuencia."
+    "Las tareas se organizan automáticamente según prioridad y frecuencia."
 )
