@@ -1,6 +1,9 @@
 from dash import Dash, html, dcc, Input, Output, State, callback_context, no_update
 import locale
-locale.setlocale(locale.LC_TIME, 'Spanish')
+try:
+    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+except:
+    pass
 import dash_bootstrap_components as dbc
 import dash_ag_grid as dag
 import plotly.graph_objects as go
