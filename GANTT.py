@@ -16,7 +16,7 @@ import logging
 # =========================================================
 # CONFIG
 # =========================================================
-ARCHIVO = r"C:\Users\NOOSDOMINGUE\Documents\Gantt\Gantt.xlsx"
+ARCHIVO = "Gantt.xlsx"
 
 COLUMNAS = [
     "ID",
